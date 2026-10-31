@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════════
-   PHOTO TOOLS · "Light Table" theme
+   PHOTO TOOLBOX · "Light Table" theme
    Warm paper, ink-black type, a film-strip header and one safelight-red accent.
    No sticky or fixed elements, no inner scrollbars.
 ═══════════════════════════════════════════════════════════════ */
@@ -296,3 +296,15 @@ fieldset { border: 0; min-width: 0; } fieldset:disabled { opacity: .5; }
 .wm-out-title { font-size: 11px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--wm-muted); }
 .wm-progress { display: none; padding: 0 20px 16px; } .wm-progress .progress-fill { width: 0; }
 .wm-progress-label { font-size: 11px; color: var(--wm-muted); margin-top: 6px; }
+
+/* Start screen: shown under the upload box until a photo is added */
+.tool-start { margin-top: 28px; } .upload-section.compact ~ .tool-start { display: none; }
+.tool-start h2 { font: 600 12px/1 var(--font); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 14px; }
+.tool-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.tool-card { display: block; text-align: left; font: inherit; color: var(--ink-2); background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; cursor: pointer; transition: border-color .15s, transform .15s; }
+.tool-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+.tool-card .n { display: block; font-size: 11px; letter-spacing: .1em; color: var(--accent); margin-bottom: 6px; }
+.tool-card strong { display: block; font: 600 18px/1.2 var(--display); color: var(--ink); margin-bottom: 4px; }
+.tool-card span:last-child { font-size: 13.5px; line-height: 1.45; }
+@media (max-width: 900px) { .tool-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .tool-grid { grid-template-columns: 1fr; } }

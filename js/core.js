@@ -10,6 +10,7 @@ function showPage(name) {
   window.dispatchEvent(new CustomEvent('pageshow-tool', { detail: name }));
 }
 document.querySelectorAll('#app-nav .nav-btn').forEach(b => b.addEventListener('click', () => showPage(b.dataset.page)));
+document.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => showPage(b.dataset.go)));
 if (location.hash.length > 1) showPage(location.hash.slice(1));
 window.addEventListener('hashchange', () => { const n = location.hash.slice(1); if (document.getElementById('page-' + n)) showPage(n); });
 

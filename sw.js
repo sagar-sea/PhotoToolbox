@@ -1,5 +1,5 @@
 /* Offline cache. Bump VERSION whenever a cached file changes. Map tiles are never cached. */
-const VERSION = 'photo-toolbox-v5';
+const VERSION = 'photo-toolbox-v6';
 const FILES = [
   './', 'index.html', 'manifest.json', 'assets/icon.svg',
   'css/style.css', 'vendor/fonts/fraunces.woff2', 'vendor/fonts/figtree.woff2',
