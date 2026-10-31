@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Photo Toolbox</title>
+    <meta name="description" content="Read photo metadata, see what-if exposure changes, watermark, resize, crop and convert images. Everything runs in your browser; photos never leave your device.">
+    <meta name="theme-color" content="#201c17">
+    <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="vendor/leaflet.css">
+    <link rel="stylesheet" href="css/style.css?v=1">
+</head>
+
+<body>
+
+<!-- HEADER: a strip of film -->
+<nav id="app-nav" aria-label="Tools">
+    <a class="brand" href="#metadata" aria-label="Photo Toolbox">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="none" stroke="#f3eee3" stroke-width="2"/><g stroke="#f3eee3" stroke-width="1.6" stroke-linecap="round"><line x1="16" y1="6" x2="16" y2="12" transform="rotate(0 16 16)"/><line x1="16" y1="6" x2="16" y2="12" transform="rotate(60 16 16)"/><line x1="16" y1="6" x2="16" y2="12" transform="rotate(120 16 16)"/><line x1="16" y1="6" x2="16" y2="12" transform="rotate(180 16 16)"/><line x1="16" y1="6" x2="16" y2="12" transform="rotate(240 16 16)"/><line x1="16" y1="6" x2="16" y2="12" transform="rotate(300 16 16)"/></g><circle cx="16" cy="16" r="3.4" fill="#d8412b"/></svg>
+        Photo Toolbox
+    </a>
+    <div class="nav-links">
+        <button class="nav-btn active" data-page="metadata"><span class="n">01</span>Metadata</button>
+        <button class="nav-btn" data-page="lab"><span class="n">02</span>Learning Lab</button>
+        <button class="nav-btn" data-page="fixer"><span class="n">03</span>Photo Fixer</button>
+        <button class="nav-btn" data-page="watermark"><span class="n">04</span>Watermark Studio</button>
+        <button class="nav-btn" data-page="convert"><span class="n">05</span>Convert</button>
+        <button class="nav-btn" data-page="crop"><span class="n">06</span>Crop</button>
+        <button class="nav-btn" data-page="collage"><span class="n">07</span>Collage</button>
+    </div>
+    <span class="nav-privacy">Your photos never leave this device</span>
+</nav>
+
+<!-- METADATA -->
+<div class="page active" id="page-metadata">
+    <div class="meta-page">
+        <div class="container wide">
+            <header class="page-head"><h1>Metadata</h1></header>
+
+            <div class="upload-section" id="uploadSection">
+                <div class="pick-row">
+                    <input type="file" id="imageInput" accept="image/*" multiple>
+                    <label for="imageInput" class="pick-label" id="metaPickLabel">
+                        <div class="pick-icon">📷</div>
+                        <p><strong>Drop photos here</strong> or click to browse</p>
+                        <span>One photo for a full report, or many for a table</span>
+                    </label>
+                </div>
+            </div>
+
+            <div id="metaBusy" class="busy" style="display:none;">
+                <div class="busy-ring"></div>
+                <p id="loadingText">Reading your photo…</p>
+            </div>
+            <div id="metaError"></div>
+
+            <!-- Batch table -->
+            <section id="batchSection" hidden>
+                <div class="toolbar">
+                    <strong id="batchCount"></strong>
+                    <span class="spacer"></span>
+                    <button class="chip-btn" id="btnCompare" disabled>⇄ Compare the 2 ticked photos</button>
+                    <button class="chip-btn" id="btnCsv" title="Open in Excel or Google Sheets">⬇ Spreadsheet (CSV)</button>
+                    <button class="chip-btn" id="btnJson" title="A text file that programs can read">⬇ JSON file</button>
+                    <button class="chip-btn" id="btnClear">✕ Remove all</button>
+                </div>
+                <div id="batchSummary" class="summary-strip"></div>
+                <div class="table-wrap"><table id="fileTable"></table></div>
+            </section>
+
+            <!-- Compare -->
+            <section id="compareView" hidden></section>
+
+            <!-- Single photo detail -->
+            <section id="detailView" hidden>
+                <div class="toolbar">
+                    <button class="chip-btn" id="btnBack">← All photos</button>
+                    <strong id="detailName"></strong>
+                    <span class="spacer"></span>
+                </div>
+                <div class="detail-top">
+                    <img id="previewImage" class="preview-image" alt="Photo preview">
+                    <div id="detailCards" class="detail-cards"></div>
+                </div>
+                <div class="tabs meta-tabs" id="metaTabs">
+                    <button class="tab-btn active" data-tab="overview">Overview</button>
+                    <button class="tab-btn" data-tab="whatif">What if…?</button>
+                    <button class="tab-btn" data-tab="where">Location &amp; privacy</button>
+                    <button class="tab-btn" data-tab="analysis">Picture check</button>
+                    <button class="tab-btn" data-tab="tags">Full list</button>
+                    <button class="tab-btn" data-tab="edit">Edit info</button>
+                </div>
+                <div id="mt-overview" class="mtab active"></div>
+                <div id="mt-whatif" class="mtab"></div>
+                <div id="mt-where" class="mtab"></div>
+                <div id="mt-analysis" class="mtab"></div>
+                <div id="mt-tags" class="mtab"></div>
+                <div id="mt-edit" class="mtab"></div>
+            </section>
+        </div>
+    </div>
+</div>
+
+<!-- LEARNING LAB -->
+<div id="page-lab" class="page">
+    <div class="tool-page">
+        <div class="tool-container">
+            <header class="page-head">
+                <h1>Learning Lab</h1>
+                <div class="seg" id="labMode"><button class="on" data-mode="learn">Lessons</button><button data-mode="challenge">Challenges</button></div>
+            </header>
+            <div class="lab-layout">
+                <div>
+                    <div class="film">
+                        <span class="film-badge tl" id="labSettings"></span>
+                        <span class="film-badge br" id="labBright"></span>
+                        <canvas id="labCanvas" width="720" height="480" role="img" aria-label="Sample scene: flowers, a cyclist and mountains"></canvas>
+                    </div>
+                    <div class="panel" style="margin-top:16px;"><div class="panel-body lab-controls" id="labControls"></div></div>
+                </div>
+                <div>
+                    <div id="labLearn">
+                        <div class="challenge-list lesson-list" id="lessonTabs"></div>
+                        <div id="lessonMeters"></div>
+                    </div>
+                    <div id="labChallenge" hidden>
+                        <div class="lab-progress" id="labProgress"></div>
+                        <div class="challenge-list" id="challengeList"></div>
+                        <div class="challenge-panel" id="challengePanel"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PHOTO FIXER -->
+<div id="page-fixer" class="page">
+    <div class="tool-page">
+        <div class="tool-container">
+            <header class="page-head"><h1>Photo Fixer</h1></header>
+            <div class="fixer-layout">
+                <div>
+                    <div class="fx-tools" id="fxTools" hidden>
+                        <button class="chip-btn" id="fxUndo" disabled>↶ Undo</button>
+                        <button class="chip-btn" id="fxRedo" disabled>↷ Redo</button>
+                        <button class="chip-btn" id="fxCompare">Hold to compare</button>
+                        <button class="chip-btn" id="fxReset">Reset all</button>
+                        <span class="spacer"></span>
+                        <label class="chip-btn" for="fxInput" style="margin:0;">Open another</label>
+                    </div>
+                    <div class="fx-stage" id="fxStage">
+                        <label class="drop fx-empty" id="fxDrop"><strong>Drop a photo</strong>or click to browse</label>
+                        <canvas id="fxCanvas" hidden aria-label="Photo being edited"></canvas>
+                    </div>
+                    <input type="file" id="fxInput" accept="image/*" hidden>
+                </div>
+                <aside class="panel"><div class="panel-body" id="fxPanel"></div></aside>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- WATERMARK STUDIO -->
+<div class="page" id="page-watermark">
+    <div class="wm-page">
+        <div class="wm-wrap">
+            <header class="page-head"><h1>Watermark Studio</h1></header>
+
+            <!-- Upload strip (compact) -->
+            <div class="panel wm-upload-panel">
+                <div class="panel-body">
+                    <div class="drop-zone" id="wmDropZone">
+                        <input type="file" id="wmPhotoInput" accept="image/*" multiple>
+                        <span class="wm-upload-line">📷 <strong>Drop images here</strong> or click to browse <em>· JPG, PNG, WebP</em></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layout">
+                <!-- Settings Panel -->
+                <div class="panel">
+                    <div class="panel-header">Settings<span style="flex:1"></span><button class="btn btn-outline btn-sm" type="button" id="wmReset" title="Put every watermark setting back to how it was originally">↺ Reset to original</button></div>
+                    <div class="panel-body">
+
+                        <div class="tabs" id="wmTabs">
+                            <button class="tab-btn active" data-tab="watermark">Watermark</button>
+                            <button class="tab-btn" data-tab="resize">Resize</button>
+                            <button class="tab-btn" data-tab="border">Border</button>
+                            <button class="tab-btn" data-tab="extras">Extras</button>
+                        </div>
+
+                        <!-- WATERMARK TAB -->
+                        <div class="tab-pane active" id="wm-pane-watermark">
+                            <div class="form-group logo-group">
+                                <label id="logoLabel">Logo (Bottom Left)</label>
+                                <div class="seg logo-seg" id="logoMode" role="group" aria-labelledby="logoLabel">
+                                    <button type="button" data-logo="custom" aria-pressed="false">Upload logo</button>
+                                    <button type="button" data-logo="none" class="on" aria-pressed="true">None</button>
+                                </div>
+                                <label class="logo-card" id="logoDropArea" for="logoInput">
+                                    <input id="logoInput" type="file" accept="image/*">
+                                    <span class="logo-thumb"><img id="logoPreview" alt=""><span id="logoPlaceholder">No logo</span></span>
+                                    <span class="logo-meta"><b id="logoTitle"></b><small id="logoDims"></small></span>
+                                    <span class="chip-btn" id="logoBrowse">Browse…</span>
+                                </label>
+                                <small class="hint logo-advice" id="logoAdvice" aria-live="polite"></small>
+                                <button type="button" class="linklike" id="logoForget" hidden>Remove my saved logo</button>
+                            </div>
+
+                            <div data-wm-fields="logoLook"></div>
+                        </div>
+
+                        <!-- RESIZE TAB -->
+                        <div id="wm-pane-resize" class="tab-pane" data-wm-fields="resize" data-wm-inside></div>
+
+                        <!-- BORDER TAB -->
+                        <div id="wm-pane-border" class="tab-pane" data-wm-fields="border" data-wm-inside></div>
+
+                        <!-- EXTRAS TAB -->
+                        <div id="wm-pane-extras" class="tab-pane">
+                            <div class="form-group">
+                                <label>Saved settings (kept in this browser)</label>
+                                <select id="wmPresetSel"><option value="">— none saved —</option></select>
+                                <div class="grid2" style="margin-top:8px;">
+                                    <input type="text" id="wmPresetName" placeholder="Name for these settings">
+                                    <button class="btn btn-outline btn-sm" type="button" id="wmPresetSave">Save</button>
+                                </div>
+                                <button class="btn btn-outline btn-sm" type="button" id="wmPresetDelete" style="margin-top:6px;width:100%;">Delete these saved settings</button>
+                            </div>
+                            <hr class="divider">
+                            <div class="grid2">
+                                <div class="form-group"><label>Logo position</label>
+                                    <select id="logoAnchor"><option value="tl">Top left</option><option value="tc">Top centre</option><option value="tr">Top right</option><option value="ml">Middle left</option><option value="mc">Centre</option><option value="mr">Middle right</option><option value="bl" selected>Bottom left</option><option value="bc">Bottom centre</option><option value="br">Bottom right</option></select></div>
+                                <div class="form-group"><label>Text position</label>
+                                    <select id="textAnchor"><option value="tl">Top left</option><option value="tc">Top centre</option><option value="tr">Top right</option><option value="ml">Middle left</option><option value="mc">Centre</option><option value="mr">Middle right</option><option value="bl">Bottom left</option><option value="bc">Bottom centre</option><option value="br" selected>Bottom right</option></select></div>
+                            </div>
+                            <hr class="divider">
+                            <div class="form-group"><label class="check"><input type="checkbox" id="tileEnable"> Repeat the text all over the photo (hard to remove)</label></div>
+                            <div class="grid2">
+                                <div class="form-group"><label>Angle</label><div class="range-row"><input type="range" id="tileAngle" min="-60" max="60" value="-30" data-unit="°"><span id="tileAngleVal">-30°</span></div></div>
+                                <div class="form-group"><label>Spacing</label><div class="range-row"><input type="range" id="tileGap" min="60" max="400" value="180" data-unit=""><span id="tileGapVal">180</span></div></div>
+                            </div>
+                            <hr class="divider">
+                            <div class="form-group"><label>Fill in text from each photo's hidden info</label>
+                                <small class="hint">Use in the text: {Make} {Model} {Lens} {Date} {Year} {Artist} {ISO} {Aperture} {Shutter} {Focal} {Filename}</small>
+                                <div style="margin-top:6px;"><button class="btn btn-outline btn-sm" type="button" data-token="© {Artist} {Year}">© Name and year</button>
+                                <button class="btn btn-outline btn-sm" type="button" data-token="{Model} · {Aperture} · {Shutter} · {ISO}">Camera and settings</button></div></div>
+                            <div class="form-group"><label>Saved file name</label><input type="text" id="wmNamePattern" value="{name}_watermarked"><small class="hint">Use {name} {date} {n}</small></div>
+                            <div class="form-group"><label>Quick size</label>
+                                <select id="wmSocial"><option value="">— keep as set on the Resize tab —</option><option value="1080">Instagram or Facebook (1080 pixels wide)</option><option value="1600">Website (1600 pixels wide)</option><option value="2048">Large website image (2048 pixels wide)</option><option value="1200">Email (1200 pixels wide)</option><option value="3000">Print (3000 pixels wide)</option></select></div>
+                        </div>
+
+                        <div data-wm-fields="output"></div>
+                    </div>
+                </div>
+
+                <!-- Results: live preview, thumbnails and download -->
+                <div class="wm-preview">
+                    <div class="panel-header wm-out-head">
+                        <span class="wm-out-title">Preview &amp; Output</span>
+                        <span class="spacer"></span>
+                        <button class="btn btn-outline btn-sm" type="button" id="wmClearPhotos">Clear All</button>
+                    </div>
+
+                    <div class="live-wrap" id="wmLiveWrap" hidden>
+                        <div class="toolbar"><strong>Live preview (what your photo will look like)</strong><span class="spacer"></span>
+                            <label class="check"><input type="checkbox" id="wmShowOriginal"> Show the photo without the watermark</label></div>
+                        <canvas id="wmLive"></canvas>
+                        <small class="hint" id="wmLiveInfo"></small>
+                    </div>
+
+                    <div class="wm-grid" id="wmGrid">
+                        <div class="empty-state">
+                            <div class="empty-icon">🖼️</div>
+                            <p>Add photos to get started</p>
+                        </div>
+                    </div>
+
+                    <div class="wm-actions">
+                        <div class="wm-status-text" id="wmStatus">No images loaded</div>
+                        <button class="btn btn-outline" type="button" id="previewBtn" hidden>👁 Preview</button>
+                        <button class="btn" type="button" id="downloadBtn" hidden>↓ Download All</button>
+                    </div>
+
+                    <div class="wm-progress" id="progressContainer">
+                        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+                        <p class="wm-progress-label" id="progressLabel">Processing...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CONVERT & COMPRESS -->
+<div id="page-convert" class="page">
+    <div class="tool-page">
+        <div class="tool-container">
+            <header class="page-head"><h1>Convert &amp; Compress</h1></header>
+            <div class="tool-grid">
+                <div class="panel">
+                    <div class="panel-header"><span>Settings</span></div>
+                    <div class="panel-body">
+                        <label class="drop" id="cvDrop">
+                            <input type="file" id="cvInput" accept="image/*" multiple hidden>
+                            <strong>Drop images</strong> or click to browse
+                        </label>
+                        <div class="form-group"><label>Format</label>
+                            <select id="cvFormat"><option value="image/jpeg">JPEG</option><option value="image/webp">WebP</option><option value="image/png">PNG</option></select></div>
+                        <div class="form-group"><label>How to shrink</label>
+                            <select id="cvMode"><option value="quality">I choose the quality</option><option value="target">Make the file this small</option></select></div>
+                        <div class="form-group" id="cvQualityRow"><label>Quality (higher = better picture, bigger file)</label>
+                            <div class="range-row"><input type="range" id="cvQuality" min="30" max="100" value="82"><span id="cvQualityVal">82%</span></div></div>
+                        <div class="form-group" id="cvTargetRow" hidden><label>Wanted size (in KB, for each photo)</label>
+                            <input type="number" id="cvTarget" value="300" min="10"></div>
+                        <div class="form-group"><label>Picture size</label>
+                            <select id="cvPreset">
+                                <option value="0">Keep the original size</option>
+                                <option value="2048">Website or blog (2048 pixels on the long side)</option>
+                                <option value="1080">Instagram or Facebook (1080 pixels)</option>
+                                <option value="1600">Email (1600 pixels)</option>
+                                <option value="3840">Big screen / 4K (3840 pixels)</option>
+                                <option value="custom">My own size…</option>
+                            </select></div>
+                        <div class="form-group" id="cvCustomRow" hidden><label>Longest side (pixels)</label><input type="number" id="cvCustom" value="1920" min="64"></div>
+                        <div class="form-group"><label>New file name</label>
+                            <input type="text" id="cvPattern" value="{name}_{w}x{h}">
+                            <small class="hint">Use {name} {w} {h} {date} {n}</small></div>
+                        <button class="btn" id="cvRun" style="width:100%;">⚡ Convert all</button>
+                        <p class="hint">Converted copies drop location and camera details.</p>
+                    </div>
+                </div>
+                <div class="panel">
+                    <div class="panel-header">Results</div>
+                    <div class="panel-body">
+                        <div id="cvList" class="result-list"></div>
+                        <div class="toolbar"><span id="cvTotals" class="hint"></span><span class="spacer"></span>
+                            <button class="btn btn-outline btn-sm" id="cvClear">Clear</button>
+                            <button class="btn btn-sm" id="cvZip" hidden>↓ Download ZIP</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CROP -->
+<div id="page-crop" class="page">
+    <div class="tool-page">
+        <div class="tool-container">
+            <header class="page-head"><h1>Crop</h1></header>
+            <div class="tool-grid">
+                <div class="panel">
+                    <div class="panel-header"><span>Settings</span></div>
+                    <div class="panel-body">
+                        <label class="drop" id="crDrop"><input type="file" id="crInput" accept="image/*" hidden><strong>Drop an image</strong> or click to browse</label>
+                        <div class="form-group"><label>Shape (aspect ratio)</label>
+                            <select id="crAspect">
+                                <option value="1">Square 1:1</option>
+                                <option value="0.8">Instagram portrait 4:5</option>
+                                <option value="1.7778">Widescreen 16:9</option>
+                                <option value="1.5">Classic 3:2</option>
+                                <option value="1.3333">Standard 4:3</option>
+                                <option value="0.5625">Story / Reel 9:16</option>
+                                <option value="0.7071">A4 portrait</option>
+                                <option value="1.4142">A4 landscape</option>
+                                <option value="3.5">Banner 3.5:1</option>
+                                <option value="orig">Same shape as the photo</option>
+                            </select></div>
+                        <div class="form-group"><label>Zoom</label>
+                            <div class="range-row"><input type="range" id="crZoom" min="100" max="400" value="100"><span id="crZoomVal">100%</span></div></div>
+                        <div class="form-group"><label>Grid</label><label class="check"><input type="checkbox" id="crGrid" checked> Show thirds grid</label></div>
+                        <div class="form-group"><label>Saved picture width (pixels)</label><input type="number" id="crWidth" value="1080" min="64"></div>
+                        <div class="form-group"><label>Format</label>
+                            <select id="crFormat"><option value="image/jpeg">JPEG</option><option value="image/png">PNG</option><option value="image/webp">WebP</option></select></div>
+                        <button class="btn" id="crSave" style="width:100%;" disabled>↓ Save crop</button>
+                    </div>
+                </div>
+                <div class="panel"><div class="panel-header">Preview (drag the photo)</div>
+                    <div class="panel-body"><canvas id="crCanvas" width="640" height="640"></canvas>
+                        <p class="hint" id="crInfo"></p></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- COLLAGE & CONTACT SHEET -->
+<div id="page-collage" class="page">
+    <div class="tool-page">
+        <div class="tool-container">
+            <header class="page-head"><h1>Collage &amp; Contact Sheet</h1></header>
+            <div class="tool-grid">
+                <div class="panel">
+                    <div class="panel-header"><span>Settings</span></div>
+                    <div class="panel-body">
+                        <label class="drop" id="coDrop"><input type="file" id="coInput" accept="image/*" multiple hidden><strong>Drop images</strong> or click to browse</label>
+                        <div class="form-group"><label>Photos per row</label>
+                            <div class="range-row"><input type="range" id="coCols" min="1" max="8" value="3"><span id="coColsVal">3</span></div></div>
+                        <div class="form-group"><label>Space between photos</label>
+                            <div class="range-row"><input type="range" id="coGap" min="0" max="60" value="16"><span id="coGapVal">16px</span></div></div>
+                        <div class="form-group"><label>Shape of each box</label>
+                            <select id="coShape"><option value="1.5">Landscape 3:2</option><option value="1">Square</option><option value="0.8">Portrait 4:5</option><option value="1.7778">Wide 16:9</option></select></div>
+                        <div class="form-group"><label>How photos fit in the boxes</label>
+                            <select id="coFit"><option value="cover">Fill each box (edges may be cut off)</option><option value="contain">Show the whole photo</option></select></div>
+                        <div class="form-group"><label>Text under each photo</label>
+                            <select id="coCaption"><option value="none">No text</option><option value="name">File name only</option><option value="exif">File name and camera settings</option></select></div>
+                        <div class="form-group"><label>Background</label><input type="color" id="coBg" value="#111111"></div>
+                        <div class="form-group"><label>Page width (pixels)</label><input type="number" id="coWidth" value="2400" min="600" step="100"></div>
+                        <button class="btn" id="coPng" style="width:100%;" disabled>↓ Download PNG</button>
+                        <button class="btn btn-outline" id="coPdf" style="width:100%;margin-top:8px;" disabled>↓ Download PDF</button>
+                    </div>
+                </div>
+                <div class="panel"><div class="panel-header">Preview</div>
+                    <div class="panel-body"><canvas id="coCanvas" width="800" height="400"></canvas><p class="hint" id="coInfo"></p></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<canvas id="wmWork" hidden></canvas>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<!-- SCRIPTS (all vendored locally so the app works offline) -->
+<script src="vendor/exifr.full.umd.js"></script>
+<script src="vendor/jszip.min.js"></script>
+<script src="vendor/leaflet.js"></script>
+<script src="vendor/piexif.js"></script>
+<script src="js/core.js?v=1"></script>
+<script src="js/exposure.js?v=1"></script>
+<script src="js/analysis.js?v=1"></script>
+<script src="js/jpeg.js?v=1"></script>
+<script src="js/lab.js?v=1"></script>
+<script src="js/fixer-core.js?v=1"></script>
+<script src="js/logo-fit.js?v=1"></script>
+<script src="js/wm-form.js?v=1"></script>
+<script src="js/metadata.js?v=1"></script>
+<script src="js/whatif.js?v=1"></script>
+<script>WmForm.mount(document);</script>
+<script src="js/watermark.js?v=1"></script>
+<script src="js/tools.js?v=1"></script>
+<script src="js/lab-ui.js?v=1"></script>
+<script src="js/fixer.js?v=1"></script>
+</body>
+</html>

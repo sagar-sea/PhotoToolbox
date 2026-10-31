@@ -1,0 +1,13 @@
+{
+  "name": "Photo Toolbox",
+  "short_name": "Toolbox",
+  "description": "Photo metadata, what-if exposure lab, watermark, convert, crop and collage. Runs offline in your browser.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f3eee3",
+  "theme_color": "#201c17",
+  "icons": [
+    { "src": "assets/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

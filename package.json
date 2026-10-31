@@ -1,0 +1,10 @@
+{
+  "name": "photo-toolbox",
+  "private": true,
+  "description": "Photo Toolbox: metadata, what-if exposure lab, learning lab, photo fixer, watermark, convert, crop and collage. Static site, no build step, runs in the browser.",
+  "scripts": {
+    "start": "python3 -m http.server 8777 --bind 127.0.0.1",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "license": "MIT"
+}
