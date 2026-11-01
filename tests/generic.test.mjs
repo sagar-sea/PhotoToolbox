@@ -42,3 +42,9 @@ test('every script the page loads exists and is in the offline cache list', () =
     assert.ok(sw.includes(`'${m[1]}'`), m[1] + ' is not in sw.js');
   }
 });
+test('asset URLs carry the same version number as the offline cache, so a changed file is never served from an old copy', () => {
+  const cache = read('sw.js').match(/const VERSION = '[\w-]*?-v(\d+)'/)[1];
+  const stamps = [...read('index.html').matchAll(/(?:src|href)="(?:js|css)\/[^"]+\?v=(\d+)"/g)].map(m => m[1]);
+  assert.ok(stamps.length >= 10, 'expected versioned scripts and styles');
+  assert.deepEqual([...new Set(stamps)], [cache], 'bump ?v= in index.html together with VERSION in sw.js');
+});
