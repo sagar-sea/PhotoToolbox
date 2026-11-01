@@ -175,7 +175,7 @@ async function wmReadTokens(f) {
   } catch (e) { /* no camera info in this file */ }
 }
 function wmTakeFiles(newFiles) {
-  for (const f of [...newFiles].filter(f => f.type.startsWith('image/'))) { files.push(f); wmReadTokens(f); }
+  for (const f of onlyPictures(newFiles)) { files.push(f); wmReadTokens(f); }
   processed = []; wmDrawGrid(); wmRefreshStatus(); wmLive();
 }
 function wmRemoveFile(idx) { files.splice(idx, 1); processed = []; wmDrawGrid(); wmRefreshStatus(); wmLive(); }

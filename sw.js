@@ -1,9 +1,9 @@
 /* Offline cache. Bump VERSION whenever a cached file changes. Map tiles are never cached. */
-const VERSION = 'photo-toolbox-v8';
+const VERSION = 'photo-toolbox-v10';
 const FILES = [
   './', 'index.html', 'manifest.json', 'assets/icon.svg',
   'css/style.css', 'vendor/fonts/fraunces.woff2', 'vendor/fonts/figtree.woff2',
-  'js/core.js', 'js/exposure.js', 'js/analysis.js', 'js/jpeg.js', 'js/lab.js', 'js/fixer-core.js', 'js/logo-fit.js', 'js/wm-form.js',
+  'js/core.js', 'js/exposure.js', 'js/analysis.js', 'js/jpeg.js', 'js/lab.js', 'js/fixer-core.js', 'js/logo-fit.js', 'js/exif-text.js', 'js/wm-form.js',
   'js/metadata.js', 'js/whatif.js', 'js/watermark.js', 'js/tools.js', 'js/lab-ui.js', 'js/fixer.js',
   'vendor/exifr.full.umd.js', 'vendor/jszip.min.js', 'vendor/piexif.js', 'vendor/leaflet.js', 'vendor/leaflet.css',
   'vendor/images/marker-icon.png', 'vendor/images/marker-icon-2x.png', 'vendor/images/marker-shadow.png', 'vendor/images/layers.png',

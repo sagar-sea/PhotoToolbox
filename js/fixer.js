@@ -114,7 +114,7 @@ const Fixer = (() => {
 
   /* ───────── file in / out ───────── */
   async function load(list) {
-    const f = [...list].find(x => x.type.startsWith('image/')); if (!f) return;
+    const f = onlyPictures(list)[0]; if (!f) return;
     try { bmp = await decodeImage(f); } catch (e) { toast('This photo cannot be opened'); return; }
     name = f.name; params = F.normalize({}); committed = F.normalize({}); undo = []; redo = [];
     $('fxDrop').hidden = true; view().hidden = false; $('fxTools').hidden = false; $('fxFields').disabled = false;

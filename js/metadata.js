@@ -76,11 +76,26 @@ const MetaApp = (() => {
     return items;
   }
 
+  /** The comment's exact bytes, for JPEGs. The reader's own text conversion damages non-English comments, so those are re-read here. */
+  async function rawUserComment(file) {
+    try {
+      const head = new Uint8Array(await readAsArrayBuffer(file.slice(0, 262144)));
+      let bin = ''; for (let i = 0; i < head.length; i += 8192) bin += String.fromCharCode(...head.subarray(i, i + 8192));
+      return piexif.load(bin).Exif[piexif.ExifIFD.UserComment] ?? null;
+    } catch (e) { return null; }                                  // not a JPEG, or no EXIF block piexif can read
+  }
+
   async function loadFile(file) {
     const photo = { id: nextId++, file, name: file.name, url: URL.createObjectURL(file), groups: {}, flat: {}, gps: null, s: {}, privacy: [], error: null };
     try {
-      const groups = await exifr.parse(file, PARSE_OPTS);
-      photo.groups = groups || {};
+      const groups = await exifr.parse(file, PARSE_OPTS) || {};
+      // the reader hands the comment back as its own top-level entry, in a raw form; read it as text and file it with the other shooting info
+      if ('userComment' in groups) {
+        let comment = groups.userComment;
+        if (typeof comment === 'string' && (/^(UNICODE|JIS)/i.test(comment) || comment.includes('\ufffd'))) comment = (await rawUserComment(file)) ?? comment;
+        groups.exif = { ...groups.exif, UserComment: ExifText.decodeUserComment(comment) }; delete groups.userComment;
+      }
+      photo.groups = groups;
       photo.flat = flatten(photo.groups);
       try {
         const g = await exifr.gps(file);
@@ -120,6 +135,7 @@ const MetaApp = (() => {
   const dash = v => (v == null || v === '') ? '–' : v;
   function fmtTag(v) {
     if (v == null) return '';
+    if (v === '') return '(empty)';
     if (v instanceof Date) return isNaN(v) ? String(v) : v.toISOString();
     if (v instanceof Uint8Array || (typeof ArrayBuffer !== 'undefined' && v instanceof ArrayBuffer)) return `[binary ${v.byteLength} bytes]`;
     if (Array.isArray(v)) return v.map(fmtTag).join(', ');
@@ -131,7 +147,7 @@ const MetaApp = (() => {
 
   /* ───────── batch view ───────── */
   const COLS = [
-    ['name', 'File', p => p.name], ['camera', 'Camera', p => [p.s.make, p.s.model].filter(Boolean).join(' ')],
+    ['name', 'File', p => p.name], ['camera', 'Camera', p => ExifText.cameraName(p.s.make, p.s.model)],
     ['lens', 'Lens', p => p.s.lens || ''], ['date', 'Taken', p => p.s.date ? p.s.date.getTime() : 0],
     ['iso', 'ISO', p => p.s.iso || 0], ['n', 'Aperture', p => p.s.n || 0], ['t', 'Shutter', p => p.s.t || 0],
     ['focal', 'Focal', p => p.s.focal || 0], ['gps', 'GPS', p => p.gps ? 1 : 0], ['privacy', 'Private items', p => p.privacy.length],
@@ -169,7 +185,7 @@ const MetaApp = (() => {
     $('fileTable').innerHTML = head + rows.map(p => `<tr data-id="${p.id}">
       <td><input type="checkbox" class="sel" ${selected.has(p.id) ? 'checked' : ''} aria-label="Select ${esc(p.name)}"></td>
       <td><a href="#" class="open">${esc(p.name)}</a></td>
-      <td>${esc(dash([p.s.make, p.s.model].filter(Boolean).join(' ')))}</td><td>${esc(dash(p.s.lens))}</td>
+      <td>${esc(dash(ExifText.cameraName(p.s.make, p.s.model)))}</td><td>${esc(dash(p.s.lens))}</td>
       <td>${esc(dash(fmtDate(p.s.date)))}</td><td>${dash(p.s.iso)}</td><td>${dash(apertureStr(p.s))}</td><td>${dash(shutterStr(p.s))}</td>
       <td>${p.s.focal ? p.s.focal + 'mm' : '–'}</td><td>${p.gps ? '📍' : '–'}</td>
       <td>${p.privacy.length ? `<span class="badge ${p.privacy.some(i => i.high) ? 'warn' : ''}">${p.privacy.length}</span>` : '–'}</td></tr>`).join('');
@@ -243,7 +259,7 @@ const MetaApp = (() => {
     const pill = (label, key, value, tip) => value == null ? '' : `<span class="pill"${tip ? ` title="${esc(tip)}"` : ''}><small>${term(key, label)}</small><b>${esc(value)}</b></span>`;
     const zoomTxt = s.focal ? s.focal + 'mm' + (s.focal35 && Math.round(s.focal35) !== Math.round(s.focal) ? ` (${Math.round(s.focal35)}mm eq.)` : '') : null;
     $('detailCards').innerHTML = '<div class="camera-info">' +
-      card('Camera', [s.make, s.model].filter(Boolean).join(' ')) + card('Lens', s.lens || s.lensSpec) +
+      card('Camera', ExifText.cameraName(s.make, s.model)) + card('Lens', s.lens || s.lensSpec) +
       card('Taken', fmtDate(s.date)) + card('Software', s.software) +
       (s.n || s.t || s.iso || s.focal ? `<div class="camera-info-item settings-strip"><h4>Camera settings for this shot</h4><div class="pills">${pill('Aperture', 'aperture', apertureStr(s))}${pill('Shutter speed', 'shutter', shutterStr(s))}${pill('ISO', 'iso', s.iso)}${pill('Zoom', 'focal', zoomTxt, s.focal35 ? 'The 35mm equivalent tells you how it compares with a standard full-frame camera.' : '')}</div></div>` : '') +
       '</div>';

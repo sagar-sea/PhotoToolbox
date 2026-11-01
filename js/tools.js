@@ -31,7 +31,7 @@ const Convert = (() => {
   }
 
   async function addFiles(list) {
-    for (const f of [...list]) if (f.type.startsWith('image/')) items.push({ file: f, name: f.name, date: '', result: null });
+    for (const f of onlyPictures(list)) items.push({ file: f, name: f.name, date: '', result: null });
     render();
     for (const it of items) if (!it.date) it.date = await exifDateOf(it.file);
   }
@@ -158,7 +158,7 @@ const Crop = (() => {
     $('crInfo').textContent = `${name}: ${bmpW(bmp)}×${bmpH(bmp)} → ${outW}×${Math.round(outW / aspect())} px`;
   }
   async function load(list) {
-    const f = [...list].find(x => x.type.startsWith('image/')); if (!f) return;
+    const f = onlyPictures(list)[0]; if (!f) return;
     try { bmp = await decodeImage(f); } catch (e) { toast(e.message); return; }
     name = f.name; ox = oy = 0; $('crZoom').value = 100; $('crZoomVal').textContent = '100%'; $('crSave').disabled = false; draw();
   }
@@ -194,8 +194,7 @@ const Collage = (() => {
   let items = [];                       // { file, bmp, caption }
 
   async function addFiles(list) {
-    for (const f of [...list]) {                 // copy: the input's FileList is emptied when the input is reset
-      if (!f.type.startsWith('image/')) continue;
+    for (const f of onlyPictures(list)) {         // a copy: the input's FileList is emptied when the input is reset
       try {
         const bmp = await decodeImage(f);
         const t = await exifr.parse(f, ['FNumber', 'ISO', 'ExposureTime', 'FocalLength']).catch(() => null) || {};

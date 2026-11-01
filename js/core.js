@@ -22,6 +22,12 @@ function esc(v) {
 const $ = (id) => document.getElementById(id);
 
 /* ─── FILES ─── */
+/** The picture files in a list. Says so out loud when none of them is a picture, instead of doing nothing. */
+function onlyPictures(list) {
+  const all = [...list], pictures = all.filter(f => f.type.startsWith('image/'));
+  if (all.length && !pictures.length) toast('Please choose picture files (like .jpg or .png).');
+  return pictures;
+}
 function readFile(file, how) {
   return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = () => rej(r.error); r[how](file); });
 }
