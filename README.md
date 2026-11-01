@@ -18,12 +18,12 @@ Open `http://127.0.0.1:8777/`. Opening `index.html` directly also works, but off
 | Page | What it does |
 |---|---|
 | **Metadata** | One photo for a full report, or many for a sortable table (CSV / JSON, summary charts, compare two photos). Tabs: Overview, What if…? (exposure sliders with estimated brightness, depth of field, motion blur, grain), Location & privacy (GPS, private data, lossless clean copy), Picture check (labelled histogram, colours, quality tips), Full list (every tag), Edit info (artist, copyright, clock shift, remove GPS). |
-| **Learning Lab** | A built-in scene (flowers, a cyclist, mountains at different distances) that reacts to aperture, shutter, ISO, zoom, focus, light and hand-held shake. Five short lessons with a live meter, and **eight challenges** with a goal checklist, bonus stars (1–3), hints and progress saved in the browser. Uses the same exposure maths as What if…. |
-| **Photo Fixer** | Exposure, contrast, highlights, shadows, saturation, warmth, sharpen, six one-click looks, Auto-fix, turn, mirror, flip, straighten, Undo/Redo, hold-to-compare, JPEG / PNG / WebP export at full size. Works on a copy. |
 | **Watermark Studio** | Logo (**your own upload** or none) + text, 9-point anchors, drag-to-position live preview, tiled text, `{Artist} {Year} {Model}` tokens, resize, border, presets, name patterns, ZIP, and **Reset to original**. With no logo the output is byte-identical to the upstream app's. |
+| **Photo Fixer** | Exposure, contrast, highlights, shadows, saturation, warmth, sharpen, six one-click looks, Auto-fix, turn, mirror, flip, straighten, Undo/Redo, hold-to-compare, JPEG / PNG / WebP export at full size. Works on a copy. |
 | **Convert** | JPEG / WebP / PNG, fixed quality or target file size, size presets, name patterns, ZIP. |
 | **Crop** | Aspect presets (Instagram, 16:9, A4…), drag + zoom, thirds grid. |
 | **Collage** | Photos on one sheet with names and shot info, PNG or PDF. |
+| **Learning Lab** | A built-in scene (flowers, a cyclist, mountains at different distances) that reacts to aperture, shutter, ISO, zoom, focus, light and hand-held shake. Five short lessons with a live meter, and **eight challenges** with a goal checklist, bonus stars (1–3), hints and progress saved in the browser. Uses the same exposure maths as What if…. |
 
 ## Layout
 
