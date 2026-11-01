@@ -8,7 +8,7 @@
     <meta name="theme-color" content="#201c17">
     <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="vendor/leaflet.css">
-    <link rel="stylesheet" href="css/style.css?v=6">
+    <link rel="stylesheet" href="css/style.css?v=7">
 </head>
 
 <body>
@@ -36,6 +36,7 @@
     <div class="meta-page">
         <div class="container wide">
             <header class="page-head"><h1>Metadata</h1></header>
+            <p class="page-sub">Every photo carries hidden details: the camera, its settings, the time and sometimes the place. Read them, see what is private and save a cleaned copy.</p>
 
             <div class="upload-section" id="uploadSection">
                 <div class="pick-row">
@@ -43,7 +44,7 @@
                     <label for="imageInput" class="pick-label" id="metaPickLabel">
                         <div class="pick-icon">📷</div>
                         <p><strong>Drop photos here</strong> or click to browse</p>
-                        <span>See when, where and how a photo was taken. One photo for a full report, many for a table</span>
+                        <span>One photo for a full report, or many for a table</span>
                     </label>
                 </div>
             </div>
@@ -121,6 +122,7 @@
                 <h1>Learning Lab</h1>
                 <div class="seg" id="labMode"><button class="on" data-mode="learn">Lessons</button><button data-mode="challenge">Challenges</button></div>
             </header>
+            <p class="page-sub">Play with a camera's settings on a practice scene. See how each one changes the photo, then try the challenges.</p>
             <div class="lab-layout">
                 <div>
                     <div class="film">
@@ -151,6 +153,7 @@
     <div class="tool-page">
         <div class="tool-container">
             <header class="page-head"><h1>Photo Fixer</h1></header>
+            <p class="page-sub">Improve one photo: brightness, colour, sharpness, turning and straightening. Your original file is never changed.</p>
             <div class="fixer-layout">
                 <div>
                     <div class="fx-tools" id="fxTools" hidden>
@@ -178,6 +181,7 @@
     <div class="wm-page">
         <div class="wm-wrap">
             <header class="page-head"><h1>Watermark Studio</h1></header>
+            <p class="page-sub">Put your logo and a line of text on photos before you share them. You can also resize them and add a border.</p>
 
             <!-- Upload strip (compact) -->
             <div class="panel wm-upload-panel">
@@ -310,6 +314,7 @@
     <div class="tool-page">
         <div class="tool-container">
             <header class="page-head"><h1>Convert &amp; Compress</h1></header>
+            <p class="page-sub">Change a photo's file type or make the file smaller, so it uploads and sends faster.</p>
             <div class="tool-grid">
                 <div class="panel">
                     <div class="panel-header"><span>Settings</span></div>
@@ -362,6 +367,7 @@
     <div class="tool-page">
         <div class="tool-container">
             <header class="page-head"><h1>Crop</h1></header>
+            <p class="page-sub">Cut a photo to the right shape for Instagram, widescreen or print.</p>
             <div class="tool-grid">
                 <div class="panel">
                     <div class="panel-header"><span>Settings</span></div>
@@ -402,6 +408,7 @@
     <div class="tool-page">
         <div class="tool-container">
             <header class="page-head"><h1>Collage &amp; Contact Sheet</h1></header>
+            <p class="page-sub">Put several photos on one sheet, with their names and camera details, then save it as an image or PDF.</p>
             <div class="tool-grid">
                 <div class="panel">
                     <div class="panel-header"><span>Settings</span></div>
@@ -438,20 +445,20 @@
 <script src="vendor/jszip.min.js"></script>
 <script src="vendor/leaflet.js"></script>
 <script src="vendor/piexif.js"></script>
-<script src="js/core.js?v=6"></script>
-<script src="js/exposure.js?v=6"></script>
-<script src="js/analysis.js?v=6"></script>
-<script src="js/jpeg.js?v=6"></script>
-<script src="js/lab.js?v=6"></script>
-<script src="js/fixer-core.js?v=6"></script>
-<script src="js/logo-fit.js?v=6"></script>
-<script src="js/wm-form.js?v=6"></script>
-<script src="js/metadata.js?v=6"></script>
-<script src="js/whatif.js?v=6"></script>
+<script src="js/core.js?v=7"></script>
+<script src="js/exposure.js?v=7"></script>
+<script src="js/analysis.js?v=7"></script>
+<script src="js/jpeg.js?v=7"></script>
+<script src="js/lab.js?v=7"></script>
+<script src="js/fixer-core.js?v=7"></script>
+<script src="js/logo-fit.js?v=7"></script>
+<script src="js/wm-form.js?v=7"></script>
+<script src="js/metadata.js?v=7"></script>
+<script src="js/whatif.js?v=7"></script>
 <script>WmForm.mount(document);</script>
-<script src="js/watermark.js?v=6"></script>
-<script src="js/tools.js?v=6"></script>
-<script src="js/lab-ui.js?v=6"></script>
-<script src="js/fixer.js?v=6"></script>
+<script src="js/watermark.js?v=7"></script>
+<script src="js/tools.js?v=7"></script>
+<script src="js/lab-ui.js?v=7"></script>
+<script src="js/fixer.js?v=7"></script>
 </body>
 </html>

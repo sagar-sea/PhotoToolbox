@@ -308,3 +308,6 @@ fieldset { border: 0; min-width: 0; } fieldset:disabled { opacity: .5; }
 .tool-card span:last-child { font-size: 13.5px; line-height: 1.45; }
 @media (max-width: 900px) { .tool-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 560px) { .tool-grid { grid-template-columns: 1fr; } }
+
+/* One plain sentence under each page title */
+.page-sub { max-width: 64ch; margin: -8px 0 22px; font-size: 15.5px; line-height: 1.5; color: var(--ink-2); }
